@@ -8,7 +8,7 @@ const t = initTRPC.context<IContext>().create();
 
 export const serverRouter = t.router({
   signup: t.procedure.input(signUpSchema).mutation(async ({ input, ctx }) => {
-    const { username, email, password } = input;
+    const { name, email, password } = input;
 
     const exists = await ctx.prisma.user.findFirst({
       where: { email },
@@ -24,7 +24,7 @@ export const serverRouter = t.router({
     const hashedPassword = await hash(password);
 
     const result = await ctx.prisma.user.create({
-      data: { username, email, password: hashedPassword },
+      data: { name, email, password: hashedPassword },
     });
 
     return {

@@ -13,7 +13,7 @@ import ErrorMessage from "../components/messages/error";
 import SignUpSuccess from "../components/messages/signUpSuccess";
 import signUpSuccess from "../components/messages/signUpSuccess";
 
-const SignUp: NextPage = () => {
+const VerifyRequest: NextPage = () => {
   const router = useRouter();
 
   const [errorMessage, setErrorMessage] = useState<any>(null);
@@ -23,7 +23,7 @@ const SignUp: NextPage = () => {
     defaultValues: {
       name: "",
       email: "",
-      password: "",
+      // password: "",
     },
     resolver: zodResolver(signUpSchema),
   });
@@ -66,68 +66,14 @@ const SignUp: NextPage = () => {
         >
           <div className="card w-96 bg-base-100 shadow-xl">
             <div className="card-body">
-              <h2 className="card-title">Create an account!</h2>
-              <Controller
-                name="name"
-                control={control}
-                render={({ field }) => (
-                  <input
-                    type="text"
-                    placeholder="Type your name..."
-                    className="input input-bordered w-full max-w-xs my-2"
-                    {...field}
-                  />
-                )}
-              />
-
-              <Controller
-                name="email"
-                control={control}
-                render={({ field }) => (
-                  <input
-                    type="email"
-                    placeholder="Type your email..."
-                    className="input input-bordered w-full max-w-xs"
-                    {...field}
-                  />
-                )}
-              />
-
-              <Controller
-                name="password"
-                control={control}
-                render={({ field }) => (
-                  <input
-                    type="password"
-                    placeholder="Type your password..."
-                    className="input input-bordered w-full max-w-xs my-2"
-                    {...field}
-                  />
-                )}
-              />
-
-              <div className="card-actions items-center justify-between">
-                <Link href="/" className="link">
-                  Go to login
-                </Link>
-
-                <button className="btn btn-secondary" type="submit">
-                  Sign Up
-                </button>
-              </div>
+              <h2 className="card-title">Check you mail</h2>
+              <h3>A sign in link has been sent to your email address.</h3>
             </div>
           </div>
         </form>
-        {showSuccessModal && (
-          <SignUpSuccess
-            onClick={() => {
-              router.push("/");
-            }}
-          />
-        )}
       </main>
     </div>
   );
 };
 
-export default SignUp;
+export default VerifyRequest;

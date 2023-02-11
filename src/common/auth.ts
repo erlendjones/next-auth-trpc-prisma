@@ -1,12 +1,32 @@
 import { NextAuthOptions } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { verify } from "argon2";
-
+import EmailProvider from "next-auth/providers/email";
 import { prisma } from "./prisma";
 import { loginSchema } from "./validation/auth";
+import { PrismaClient, Prisma } from "@prisma/client";
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
 
 export const nextAuthOptions: NextAuthOptions = {
+  adapter: PrismaAdapter(prisma),
   providers: [
+    EmailProvider({
+      name: "email",
+      server: {
+        secure: process.env.MAIL_SECURE === "true",
+        host: process.env.MAIL_HOST,
+        port: process.env.MAIL_PORT,
+        auth: {
+          user: process.env.MAIL_USER,
+          pass: process.env.MAIL_PASS,
+        },
+        tls: {
+          rejectUnauthorized: false,
+        },
+      },
+      from: process.env.MAIL_EMAIL,
+      maxAge: 24 * 60 * 60, // How long email links are valid for (default 24h)
+    }),
     Credentials({
       name: "credentials",
       credentials: {
@@ -19,6 +39,10 @@ export const nextAuthOptions: NextAuthOptions = {
       },
       authorize: async (credentials) => {
         try {
+          return null;
+
+          // deactivated
+          /*
           const { email, password } = await loginSchema.parseAsync(credentials);
 
           const result = await prisma.user.findFirst({
@@ -31,7 +55,8 @@ export const nextAuthOptions: NextAuthOptions = {
 
           if (!isValidPassword) return null;
 
-          return { id: result.id, email, username: result.username };
+          return { id: result.id, email, name: result.name };
+          */
         } catch {
           return null;
         }
@@ -43,7 +68,7 @@ export const nextAuthOptions: NextAuthOptions = {
       if (user) {
         token.userId = user.id;
         token.email = user.email;
-        token.username = user.username;
+        token.name = user.name;
       }
 
       return token;
@@ -52,9 +77,9 @@ export const nextAuthOptions: NextAuthOptions = {
       if (token) {
         session.user.userId = token.userId;
         session.user.email = token.email;
-        session.user.username = token.username;
+        session.user.name = token.name;
       }
-   
+
       return session;
     },
   },
@@ -64,6 +89,7 @@ export const nextAuthOptions: NextAuthOptions = {
   pages: {
     signIn: "/",
     newUser: "/sign-up",
+    verifyRequest: "/verify-request",
   },
-  secret: "super-secret",
+  secret: process.env["AUTH_JWT_SECRET"],
 };
